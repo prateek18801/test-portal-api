@@ -1,7 +1,7 @@
 {
   "name": "test-portal-server",
   "version": "1.0.0",
-  "description": "server for test portal (BDCoE)",
+  "description": "server for test portal",
   "main": "index.js",
   "scripts": {
     "start": "node app.js",
