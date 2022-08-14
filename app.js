@@ -4,6 +4,7 @@ const cluster = require('node:cluster');
 const os = require('node:os');
 const express = require('express');
 
+require('./api/utils/db').connect();
 const adminRoutes = require('./api/routes/admin');
 const errorHandler = require('./api/middlewares/error');
 
