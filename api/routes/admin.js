@@ -5,11 +5,7 @@ const adminController = require('../controllers/admin');
 // question routes
 router.get('/test/:id?', adminController.getTest);
 
-// router.post('/test', );
-
-// router.patch('/test/:id', );
-
-// router.delete('/test/:id', );
+router.post('/test/:id?', adminController.postTest);
 
 // // test routes
 // router.get('/question/:id');
