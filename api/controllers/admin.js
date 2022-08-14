@@ -71,3 +71,83 @@ exports.deleteTest = async (req, res, next) => {
         next(error);
     }
 }
+
+
+exports.getQuestion = async (req, res, next) => {
+    const _id = req.params.id;
+    try {
+
+        const data = await Question.findById(_id);
+
+        return res.status(200).json({
+            message: 'success',
+            data
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.postQuestion = async (req, res, next) => {
+    const _id = req.params.id;
+
+    const data = {
+        ...req.body,
+        // author: req.user.username
+        author: 'prateek'
+    };
+
+    try {
+        const test = await Test.findById(data.testId);
+
+        if (_id) {
+
+            const existing = await Question.findById(_id);
+            if (existing) {
+
+                Object.keys(data).forEach(key => existing[key] = data[key]);
+
+                const updated = await existing.save();
+                test.questions.push(updated._id);
+                await test.save();
+
+                return res.status(200).json({
+                    message: 'upadated',
+                    data: updated
+                });
+            }
+        }
+
+        const saved = await new Question({ ...data }).save();
+        // create function to update array
+        // check if id already exists in array
+        // if exists the do not push
+        test.questions.push(saved._id);
+        await test.save();
+
+        return res.status(201).json({
+            message: 'created',
+            data: saved
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.deleteQuestion = async (req, res, next) => {
+    const _id = req.params.id;
+    try {
+
+        const deleted = await Question.findByIdAndDelete(_id);
+
+        return res.status(200).json({
+            message: 'deleted',
+            data: deleted
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
