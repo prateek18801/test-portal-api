@@ -51,3 +51,19 @@ exports.postTest = async (req, res, next) => {
         next(error);
     }
 }
+
+exports.deleteTest = async (req, res, next) => {
+    const _id = req.params.id;
+    try {
+
+        const deleted = await Test.findByIdAndDelete(_id);
+
+        return res.status(200).json({
+            message: 'deleted',
+            data: deleted
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
