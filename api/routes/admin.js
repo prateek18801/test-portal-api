@@ -7,6 +7,8 @@ router.get('/test/:id?', adminController.getTest);
 
 router.post('/test/:id?', adminController.postTest);
 
+router.delete('/test/:id', adminController.deleteTest);
+
 // // test routes
 // router.get('/question/:id');
 
