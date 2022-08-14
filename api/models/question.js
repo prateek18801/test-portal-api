@@ -7,8 +7,7 @@ const questionSchema = mongoose.Schema({
     },
     serial: {
         type: Number,
-        required: true,
-        unique: true
+        required: true
     },
     statement: {
         type: String,
@@ -55,6 +54,10 @@ const questionSchema = mongoose.Schema({
     negative: {
         type: Number,
         default: 0
+    },
+    author: {
+        type: String,
+        required: true
     }
 }, { timestamps: true });
 
