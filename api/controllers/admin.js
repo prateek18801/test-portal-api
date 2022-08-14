@@ -1,11 +1,12 @@
 const Test = require('../models/test');
 const Question = require('../models/question');
 
+
 exports.getTest = async (req, res, next) => {
     const _id = req.params.id;
     try {
 
-        const data = _id ? await Test.findById({ _id }) : await Test.find({});
+        const data = _id ? await Test.findById(_id) : await Test.find({});
 
         return res.status(200).json({
             message: 'success',
@@ -19,20 +20,23 @@ exports.getTest = async (req, res, next) => {
 
 exports.postTest = async (req, res, next) => {
     const _id = req.params.id;
-    req.body.code = req.body.code.toUpperCase();
-    req.body.duration = new Date(req.body.end) - new Date(req.body.start);
-    req.body.author = 'prateek';
+
+    const data = {
+        ...req.body,
+        code: req.body.code.toUpperCase(),
+        duration: new Date(req.body.end) - new Date(req.body.start),
+        // author: req.user.username
+        author: 'prateek'
+    };
 
     try {
 
         if (_id) {
-            let existing = await Test.findById(_id);
+            const existing = await Test.findById(_id);
             if (existing) {
-               
-                Object.keys(req.body).forEach(key => {
-                    existing[key] = req.body[key];
-                });
-                
+
+                Object.keys(data).forEach(key => existing[key] = data[key]);
+
                 const updated = await existing.save();
                 return res.status(200).json({
                     message: 'upadated',
@@ -41,7 +45,7 @@ exports.postTest = async (req, res, next) => {
             }
         }
 
-        const saved = await new Test({ ...req.body }).save();
+        const saved = await new Test({ ...data }).save();
         return res.status(201).json({
             message: 'created',
             data: saved
