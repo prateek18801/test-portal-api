@@ -6,7 +6,10 @@ exports.getTest = async (req, res, next) => {
     const _id = req.params.id;
     try {
 
-        const data = _id ? await Test.findById(_id) : await Test.find({});
+        // for user
+        // const data = _id ? await Test.findById(_id).populate('questions', '-answer -testId -author -__v') : await Test.find({}).populate('questions', '-answer -testId -author -__v');
+        const data = _id ? await Test.findById(_id).populate('questions') : await Test.find({}).populate('questions');
+
 
         return res.status(200).json({
             message: 'success',
@@ -99,17 +102,22 @@ exports.postQuestion = async (req, res, next) => {
     };
 
     try {
+
         const test = await Test.findById(data.testId);
+        if (!test) {
+            const error = new Error('invalid test id');
+            error.code = 400;
+            throw error;
+        }
 
         if (_id) {
-
             const existing = await Question.findById(_id);
             if (existing) {
 
                 Object.keys(data).forEach(key => existing[key] = data[key]);
 
                 const updated = await existing.save();
-                test.questions.push(updated._id);
+                test.questions = appendUnique(test.questions, updated._id);
                 await test.save();
 
                 return res.status(200).json({
@@ -120,10 +128,8 @@ exports.postQuestion = async (req, res, next) => {
         }
 
         const saved = await new Question({ ...data }).save();
-        // create function to update array
-        // check if id already exists in array
-        // if exists the do not push
-        test.questions.push(saved._id);
+
+        test.questions = appendUnique(test.questions, saved._id);
         await test.save();
 
         return res.status(201).json({
@@ -141,6 +147,9 @@ exports.deleteQuestion = async (req, res, next) => {
     try {
 
         const deleted = await Question.findByIdAndDelete(_id);
+        const test = await Test.findById(deleted.testId);
+        test.questions = removeElement(test.questions, deleted._id);
+        await test.save();
 
         return res.status(200).json({
             message: 'deleted',
@@ -150,4 +159,16 @@ exports.deleteQuestion = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+}
+
+function appendUnique(list, value) {
+    return list.includes(value) ? list : [...list, value];
+}
+
+function removeElement(list, value) {
+    const idx = list.indexOf(value);
+    if (idx > -1) {
+        list.splice(idx, 1)
+    }
+    return list;
 }
