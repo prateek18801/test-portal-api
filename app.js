@@ -5,6 +5,7 @@ const os = require('node:os');
 const express = require('express');
 
 require('./api/utils/db').connect();
+const userRoutes = require('./api/routes/user');
 const adminRoutes = require('./api/routes/admin');
 const errorHandler = require('./api/middlewares/error');
 
@@ -13,6 +14,7 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+app.use('/api', userRoutes);
 app.use('/api/admin', adminRoutes);
 
 app.use(errorHandler);
