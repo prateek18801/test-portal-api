@@ -12,9 +12,19 @@ exports.getTest = async (req, res, next) => {
 
     try {
 
-        const test = await Test.findById(_id).populate('questions', '-answer -author -__v');
+        const test = await Test.findById(_id, '-__v -author -contributors').populate('questions', '-answer -author -__v');
 
-        let response = await Response.findOne({ testId: _id, username: data.username });
+        if (new Date(test.start) > Date.now()) {
+            return res.status(403).json({
+                message: 'forbidden',
+                start: test.start,
+                end: test.end,
+                duration: test.duration,
+                wait: new Date(test.start) - Date.now()
+            });
+        }
+
+        let response = await Response.findOne({ testId: _id, username: data.username }, '-__v');
         if (!response) {
             response = await new Response({ ...data }).save();
         }
