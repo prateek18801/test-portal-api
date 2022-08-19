@@ -1,15 +1,13 @@
 const Test = require('../models/test');
 const Question = require('../models/question');
+const Response = require('../models/response');
 
 
 exports.getTest = async (req, res, next) => {
     const _id = req.params.id;
     try {
 
-        // for user
-        // const data = _id ? await Test.findById(_id).populate('questions', '-answer -testId -author -__v') : await Test.find({}).populate('questions', '-answer -testId -author -__v');
         const data = _id ? await Test.findById(_id).populate('questions') : await Test.find({}).populate('questions');
-
 
         return res.status(200).json({
             message: 'success',
@@ -160,6 +158,56 @@ exports.deleteQuestion = async (req, res, next) => {
         next(error);
     }
 }
+
+exports.evaluateTest = async (req, res, next) => {
+    const testId = req.params.id;
+    try {
+
+        const questions = await Question.find({ testId });
+        const answerKey = {};
+
+        // map all questions of the test to be evaluated
+        questions.forEach(question => {
+            answerKey[question._id.toString()] = {
+                answer: question.answer,
+                options: question.options,
+                positive: question.positive,
+                negative: question.negative
+            }
+        });
+
+        const responses = await Response.find({ testId });
+
+        responses.forEach(async response => {
+            let score = 0;
+            response.answers.forEach(answer => {
+
+                const question = answerKey[answer.question.toString()];
+
+                if (!question.options || !question) { return; }
+
+                if (answer.response === question.answer) {
+                    score += question.positive;
+                } else {
+                    score -= question.negative;
+                }
+            });
+            response.score = score;
+            await response.save();
+        });
+
+        return res.status(200).json({
+            message: 'success',
+            data: responses
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+// utility functions
 
 function appendUnique(list, value) {
     return list.includes(value) ? list : [...list, value];
