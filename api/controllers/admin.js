@@ -206,6 +206,21 @@ exports.evaluateTest = async (req, res, next) => {
     }
 }
 
+exports.getResults = async (req, res, next) => {
+    const testId = req.params.id;
+    try {
+        
+        const responses = await Response.find({ testId });
+        return res.status(200).json({
+            message: 'success',
+            data: responses
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
 
 // utility functions
 
