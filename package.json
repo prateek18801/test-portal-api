@@ -4,7 +4,7 @@
   "description": "server for test portal",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node -r dotenv/config app.js",
     "dev": "nodemon -r dotenv/config app.js"
   },
   "author": "prateek",
