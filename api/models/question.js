@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
 const questionSchema = mongoose.Schema({
-    testId: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true
-    },
     serial: {
         type: Number,
         required: true
@@ -22,6 +18,9 @@ const questionSchema = mongoose.Schema({
         enum: ['text', 'image', 'video', 'audio', 'link', 'frame'],
         default: 'text'
     },
+    url: {
+        type: String
+    },
     a: {
         type: String,
         required: true
@@ -38,9 +37,9 @@ const questionSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    answer: {
+    key: {
         type: String,
-        enum: ['a', 'b', 'c', 'd', 'none'],
+        enum: ['a', 'b', 'c', 'd', 'text'],
         required: true
     },
     options: {
